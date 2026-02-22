@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LPU Campus Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --lpu-maroon: #8B1A1A;
+      --lpu-gold: #D4AF37;
+      --lpu-dark: #1a1a2e;
+      --sidebar-width: 260px;
+    }
+    body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+
+    /* Sidebar */
+    #sidebar {
+      width: var(--sidebar-width);
+      min-height: 100vh;
+      background: linear-gradient(160deg, var(--lpu-dark) 0%, #16213e 100%);
+      position: fixed; top: 0; left: 0; z-index: 1000;
+      transition: 0.3s;
+      overflow-y: auto;
+    }
+    .sidebar-brand {
+      background: var(--lpu-maroon);
+      padding: 20px 16px;
+      border-bottom: 3px solid var(--lpu-gold);
+    }
+    .sidebar-brand h5 { color: #fff; margin: 0; font-weight: 700; font-size: 0.95rem; }
+    .sidebar-brand span { color: var(--lpu-gold); font-size: 0.75rem; }
+
+    .sidebar-menu { padding: 12px 0; }
+    .menu-label {
+      color: #6c8ebf; font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 1px; text-transform: uppercase;
+      padding: 12px 20px 4px;
+    }
+    .nav-link-item {
+      display: flex; align-items: center; gap: 10px;
+      color: #c5cae9; text-decoration: none;
+      padding: 10px 20px; border-radius: 0;
+      transition: 0.2s; font-size: 0.9rem;
+    }
+    .nav-link-item:hover, .nav-link-item.active {
+      background: rgba(212, 175, 55, 0.15);
+      color: var(--lpu-gold);
+      border-left: 3px solid var(--lpu-gold);
+    }
+    .nav-link-item i { width: 20px; text-align: center; }
+
+    /* Main content */
+    #main-content {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+    }
+    .topbar {
+      background: white;
+      padding: 14px 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .topbar h4 { margin: 0; font-weight: 700; color: var(--lpu-dark); font-size: 1.1rem; }
+    .page-body { padding: 28px; }
+
+    /* Cards */
+    .stat-card {
+      border: none; border-radius: 16px;
+      padding: 24px; color: white;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-4px); }
+    .stat-card .icon { font-size: 2.2rem; opacity: 0.8; }
+    .stat-card .number { font-size: 2.4rem; font-weight: 800; }
+    .stat-card .label { font-size: 0.85rem; opacity: 0.85; }
+    .card-blue   { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .card-green  { background: linear-gradient(135deg, #11998e, #38ef7d); }
+    .card-orange { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .card-red    { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+    .card-teal   { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+    .card-gold   { background: linear-gradient(135deg, #f6d365, #fda085); }
+
+    .data-card {
+      background: white; border-radius: 16px; border: none;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .data-card .card-header {
+      background: white; border-bottom: 1px solid #f0f0f0;
+      border-radius: 16px 16px 0 0 !important;
+      padding: 18px 24px; font-weight: 700; color: var(--lpu-dark);
+    }
+    .table th {
+      background: #f8f9fa; font-weight: 600;
+      color: #495057; font-size: 0.85rem;
+    }
+    .badge-pill { border-radius: 50px; padding: 5px 12px; font-size: 0.75rem; }
+    .progress { height: 8px; border-radius: 4px; }
+
+    /* Alerts */
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+    .lpu-badge {
+      background: var(--lpu-maroon); color: white;
+      padding: 3px 10px; border-radius: 4px; font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sidebar-brand">
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <i class="bi bi-buildings-fill" style="color:var(--lpu-gold);font-size:1.4rem"></i>
+      <h5>LPU Campus<br>Management</h5>
+    </div>
+    <span>Smart AI-Enabled System</span>
+  </div>
+  <div class="sidebar-menu">
+    <div class="menu-label">Overview</div>
+    <a href="{% url 'dashboard' %}" class="nav-link-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+      <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+    <a href="{% url 'ai_insights' %}" class="nav-link-item {% if request.resolver_match.url_name == 'ai_insights' %}active{% endif %}">
+      <i class="bi bi-stars"></i> AI Insights
+    </a>
+
+    <div class="menu-label">Campus</div>
+    <a href="{% url 'block_list' %}" class="nav-link-item {% if 'block' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-building"></i> Campus Blocks
+    </a>
+    <a href="{% url 'classroom_list' %}" class="nav-link-item {% if 'classroom' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-door-open"></i> Classrooms
+    </a>
+
+    <div class="menu-label">Academics</div>
+    <a href="{% url 'department_list' %}" class="nav-link-item {% if 'department' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-diagram-3"></i> Departments
+    </a>
+    <a href="{% url 'course_list' %}" class="nav-link-item {% if 'course' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-book"></i> Courses
+    </a>
+    <a href="{% url 'faculty_list' %}" class="nav-link-item {% if 'faculty' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-person-badge"></i> Faculty
+    </a>
+    <a href="{% url 'student_list' %}" class="nav-link-item {% if 'student' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-mortarboard"></i> Students
+    </a>
+
+    <div class="menu-label">Account</div>
+    <a href="/admin/" class="nav-link-item" target="_blank">
+      <i class="bi bi-gear"></i> Admin Panel
+    </a>
+    <a href="{% url 'logout' %}" class="nav-link-item">
+      <i class="bi bi-box-arrow-left"></i> Logout
+    </a>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="main-content">
+  <div class="topbar">
+    <h4>{% block page_title %}Dashboard{% endblock %}</h4>
+    <div class="d-flex align-items-center gap-3">
+      <span class="lpu-badge"><i class="bi bi-person-circle me-1"></i>{{ user.username }}</span>
+    </div>
+  </div>
+
+  <!-- Flash Messages -->
+  {% if messages %}
+  <div class="toast-container">
+    {% for msg in messages %}
+    <div class="toast show align-items-center text-white bg-{% if msg.tags == 'error' %}danger{% elif msg.tags == 'success' %}success{% else %}info{% endif %} border-0 mb-2" role="alert">
+      <div class="d-flex">
+        <div class="toast-body">{{ msg }}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="page-body">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+{% else %}
+{% block auth_content %}{% endblock %}
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block extra_js %}{% endblock %}
+<script>
+  // Auto-dismiss toasts
+  setTimeout(() => {
+    document.querySelectorAll('.toast').forEach(t => {
+      new bootstrap.Toast(t, {delay: 3000}).show();
+    });
+  }, 100);
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{% extends 'campus/base.html' %}
+{% block page_title %}Campus Blocks{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="fw-bold mb-0">All Campus Blocks</h5>
+  <a href="{% url 'block_add' %}" class="btn text-white" style="background:#8B1A1A">
+    <i class="bi bi-plus-lg me-1"></i>Add Block
+  </a>
+</div>
+<div class="data-card card">
+  <div class="card-body p-0">
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th class="ps-4">#</th>
+          <th>Block Name</th>
+          <th>Description</th>
+          <th>Floors</th>
+          <th>Classrooms</th>
+          <th>Total Capacity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for block in blocks %}
+        <tr>
+          <td class="ps-4">{{ forloop.counter }}</td>
+          <td class="fw-semibold">{{ block.name }}</td>
+          <td class="text-muted" style="max-width:200px">{{ block.description|truncatechars:50 }}</td>
+          <td>{{ block.total_floors }}</td>
+          <td><span class="badge bg-primary">{{ block.total_classrooms }}</span></td>
+          <td>{{ block.total_capacity }}</td>
+          <td>
+            <a href="{% url 'block_edit' block.pk %}" class="btn btn-sm btn-outline-primary me-1">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <a href="{% url 'block_delete' block.pk %}" class="btn btn-sm btn-outline-danger">
+              <i class="bi bi-trash"></i>
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-5">No blocks found. <a href="{% url 'block_add' %}">Add one</a>.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

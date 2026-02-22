@@ -1,0 +1,36 @@
+{% extends 'campus/base.html' %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="data-card card">
+      <div class="card-header">
+        <i class="bi bi-pencil-square me-2"></i>{{ title }}
+      </div>
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+            {% endif %}
+            {% if field.help_text %}
+              <div class="text-muted small mt-1">{{ field.help_text }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn text-white px-4" style="background:#8B1A1A">
+              <i class="bi bi-check-lg me-1"></i>Save
+            </button>
+            <a href="{% url back_url %}" class="btn btn-outline-secondary px-4">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

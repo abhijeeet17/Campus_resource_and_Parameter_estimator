@@ -1,0 +1,179 @@
+{% extends 'campus/base.html' %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+
+<!-- Stat Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-xl-2 col-md-4 col-6">
+    <div class="stat-card card-blue">
+      <div class="icon"><i class="bi bi-building"></i></div>
+      <div class="number">{{ total_blocks }}</div>
+      <div class="label">Campus Blocks</div>
+    </div>
+  </div>
+  <div class="col-xl-2 col-md-4 col-6">
+    <div class="stat-card card-green">
+      <div class="icon"><i class="bi bi-door-open"></i></div>
+      <div class="number">{{ total_classrooms }}</div>
+      <div class="label">Classrooms</div>
+    </div>
+  </div>
+  <div class="col-xl-2 col-md-4 col-6">
+    <div class="stat-card card-orange">
+      <div class="icon"><i class="bi bi-diagram-3"></i></div>
+      <div class="number">{{ total_departments }}</div>
+      <div class="label">Departments</div>
+    </div>
+  </div>
+  <div class="col-xl-2 col-md-4 col-6">
+    <div class="stat-card card-teal">
+      <div class="icon"><i class="bi bi-person-badge"></i></div>
+      <div class="number">{{ total_faculty }}</div>
+      <div class="label">Faculty</div>
+    </div>
+  </div>
+  <div class="col-xl-2 col-md-4 col-6">
+    <div class="stat-card card-red">
+      <div class="icon"><i class="bi bi-mortarboard"></i></div>
+      <div class="number">{{ total_students }}</div>
+      <div class="label">Students</div>
+    </div>
+  </div>
+  <div class="col-xl-2 col-md-4 col-6">
+    <div class="stat-card card-gold">
+      <div class="icon"><i class="bi bi-book"></i></div>
+      <div class="number">{{ total_courses }}</div>
+      <div class="label">Courses</div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="data-card card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-bar-chart me-2" style="color:#667eea"></i>Block Capacity Overview</span>
+      </div>
+      <div class="card-body">
+        <canvas id="blockChart" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="data-card card h-100">
+      <div class="card-header">
+        <span><i class="bi bi-pie-chart me-2" style="color:#11998e"></i>Faculty Workload Distribution</span>
+      </div>
+      <div class="card-body">
+        <canvas id="facultyChart" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Block Utilization Table + Recent Students -->
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="data-card card">
+      <div class="card-header">
+        <i class="bi bi-building me-2" style="color:#f5576c"></i>Campus Block Utilization
+      </div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th class="ps-4">Block</th>
+              <th>Classrooms</th>
+              <th>Capacity</th>
+              <th>Utilization</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in block_data %}
+            <tr>
+              <td class="ps-4 fw-semibold">{{ b.name }}</td>
+              <td>{{ b.classrooms }}</td>
+              <td>{{ b.capacity }}</td>
+              <td style="width:180px">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="progress flex-grow-1">
+                    <div class="progress-bar {% if b.utilization > 80 %}bg-danger{% elif b.utilization > 50 %}bg-warning{% else %}bg-success{% endif %}"
+                         style="width:{{ b.utilization }}%"></div>
+                  </div>
+                  <small>{{ b.utilization }}%</small>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted py-4">No blocks added yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="data-card card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-mortarboard me-2" style="color:#4facfe"></i>Recent Students</span>
+        <a href="{% url 'student_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="card-body p-0">
+        {% for s in recent_students %}
+        <div class="d-flex align-items-center gap-3 px-4 py-3 border-bottom">
+          <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+               style="width:38px;height:38px;background:linear-gradient(135deg,#667eea,#764ba2);font-size:0.9rem;flex-shrink:0">
+            {{ s.name|first }}
+          </div>
+          <div>
+            <div class="fw-semibold" style="font-size:0.9rem">{{ s.name }}</div>
+            <div class="text-muted" style="font-size:0.78rem">{{ s.registration_number }} · Sem {{ s.semester }}</div>
+          </div>
+          <span class="ms-auto badge bg-primary bg-opacity-10 text-primary">{{ s.department }}</span>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-4">No students yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+fetch("{% url 'analytics_data' %}").then(r => r.json()).then(data => {
+  // Block chart
+  new Chart(document.getElementById('blockChart'), {
+    type: 'bar',
+    data: {
+      labels: data.blocks.labels,
+      datasets: [{
+        label: 'Total Capacity',
+        data: data.blocks.capacity,
+        backgroundColor: 'rgba(102,126,234,0.7)',
+        borderRadius: 6,
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  // Faculty workload doughnut
+  new Chart(document.getElementById('facultyChart'), {
+    type: 'doughnut',
+    data: {
+      labels: data.faculty.labels,
+      datasets: [{
+        data: data.faculty.workload,
+        backgroundColor: ['#667eea','#11998e','#f093fb','#f5576c','#4facfe','#43e97b','#f6d365','#fda085'],
+        borderWidth: 2,
+      }]
+    },
+    options: { responsive: true, cutout: '65%' }
+  });
+});
+</script>
+{% endblock %}

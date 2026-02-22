@@ -1,0 +1,50 @@
+{% extends 'campus/base.html' %}
+{% block page_title %}Departments{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="fw-bold mb-0">All Departments</h5>
+  <a href="{% url 'department_add' %}" class="btn text-white" style="background:#8B1A1A">
+    <i class="bi bi-plus-lg me-1"></i>Add Department
+  </a>
+</div>
+<div class="row g-4">
+  {% for dept in departments %}
+  <div class="col-lg-4 col-md-6">
+    <div class="data-card card p-4">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+          <h6 class="fw-bold mb-1">{{ dept.name }}</h6>
+          <span class="badge bg-dark">{{ dept.code }}</span>
+        </div>
+        <div class="d-flex gap-1">
+          <a href="{% url 'department_edit' dept.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+          <a href="{% url 'department_delete' dept.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+        </div>
+      </div>
+      <div class="row g-2 text-center">
+        <div class="col-4">
+          <div class="p-2 rounded-3" style="background:#f8f9fa">
+            <div class="fw-bold text-primary">{{ dept.faculty_count }}</div>
+            <div class="text-muted" style="font-size:0.72rem">Faculty</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="p-2 rounded-3" style="background:#f8f9fa">
+            <div class="fw-bold text-success">{{ dept.course_count }}</div>
+            <div class="text-muted" style="font-size:0.72rem">Courses</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="p-2 rounded-3" style="background:#f8f9fa">
+            <div class="fw-bold text-warning">{{ dept.student_count }}</div>
+            <div class="text-muted" style="font-size:0.72rem">Students</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12 text-center text-muted py-5">No departments found. <a href="{% url 'department_add' %}">Add one</a>.</div>
+  {% endfor %}
+</div>
+{% endblock %}
